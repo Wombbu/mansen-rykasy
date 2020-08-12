@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled, { keyframes } from "styled-components";
-import { PlayerState, gameState } from "./state";
+import { PlayerState, gameState, gameOptions, GameState } from "./state";
 import { useRecoilState } from "recoil";
 
 const borderMove = keyframes`
@@ -95,15 +95,17 @@ const speechBubbles = ["./puhe1.gif", "./puhe2.png", "./puhe3.gif"];
 export const Track = ({
   p1State,
   p2State,
+  game,
 }: {
   p1State: PlayerState;
   p2State: PlayerState;
+  game: GameState;
 }) => {
   const [speechBubbleSrc, setSpeechBubbleSrc] = React.useState(
     speechBubbles[0]
   );
 
-  const [game, setGame] = useRecoilState(gameState);
+  const [options] = useRecoilState(gameOptions);
 
   React.useEffect(() => {
     setInterval(() => {
@@ -117,7 +119,7 @@ export const Track = ({
       <Cyclist
         style={{
           left: `${Math.min(
-            18 + (p1State.distance / game.totalDistance) * 72,
+            18 + (p1State.distance / options.totalDistance) * 72,
             90
           )}%`,
         }}
@@ -129,7 +131,7 @@ export const Track = ({
       <Cyclist
         style={{
           left: `${Math.min(
-            18 + (p2State.distance / game.totalDistance) * 72,
+            18 + (p2State.distance / options.totalDistance) * 72,
             90
           )}%`,
         }}
