@@ -1,5 +1,7 @@
 import * as React from 'react';
 import styled, {keyframes} from 'styled-components';
+import { PlayerState, gameState } from './state';
+import { useRecoilState } from 'recoil';
 
 const borderMove = keyframes`
     0% {
@@ -94,8 +96,10 @@ const speechBubbles = [
     './puhe3.gif'
 ];
 
-export const Track = ({p1Name, p2Name}: {p1Name: string, p2Name: string}) => {
+export const Track = ({p1State, p2State}: {p1State: PlayerState, p2State: PlayerState}) => {
     const [speechBubbleSrc, setSpeechBubbleSrc] = React.useState(speechBubbles[0]);
+
+    const [game, setGame] = useRecoilState(gameState);
 
     React.useEffect(() => {
         setInterval(() => {
@@ -103,24 +107,16 @@ export const Track = ({p1Name, p2Name}: {p1Name: string, p2Name: string}) => {
         }, 5000)
     }, []);
 
-    const [pos, setPos] = React.useState(0);
-
-    React.useEffect(() => {
-        setTimeout(() => {
-            setPos(pos + 2)
-        }, 200)
-    }, [pos]);
-
     return (
         <TrackContainer>
-            <SpeechBubble src={speechBubbleSrc} />
-            <Cyclist style={{left: `${Math.min(5 + pos, 90)}%`}}  top={35} size={90} src="./cyclist.gif" />
+            {game.state === 'IDLE' && <SpeechBubble src={speechBubbleSrc} />}
+            <Cyclist style={{left: `${Math.min(18 + (p1State.distance / game.totalDistance) * 72, 90)}%`}}  top={35} size={90} src="./cyclist.gif" />
             <Car src="./car2.png" />
-            <Cyclist style={{left: `${Math.min(5 + pos * 0.8, 90)}%`}} top={130} size={100} src="./cyclist.gif" />
+            <Cyclist style={{left: `${Math.min(18 + (p2State.distance / game.totalDistance) * 72, 90)}%`}} top={130} size={100} src="./cyclist.gif" />
             <Pavement />
-            <RoadTop>{p1Name}</RoadTop>
+            <RoadTop>{p1State.name}</RoadTop>
             <Dashlane/>
-            <RoadBottom>{p2Name}</RoadBottom>
+            <RoadBottom>{p2State.name}</RoadBottom>
         </TrackContainer>
         );
 };
