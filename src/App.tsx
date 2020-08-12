@@ -18,6 +18,7 @@ import {
   StartButton,
 } from "./App.styles";
 import { Settings } from "./Settings";
+import { MessageHandler, Ticks } from "./messageHandler";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -26,6 +27,15 @@ const useGameLogic = () => {
   const [p2, setP2State] = useRecoilState(p2State);
   const [game, setGame] = useRecoilState(gameState);
   const interval = React.useRef<any>();
+  const messageHandlerRef = React.useRef<{
+    reset: () => void;
+    playersStartRiding: () => void;
+    getTicks: () => Ticks;
+  }>();
+
+  React.useEffect(() => {
+    messageHandlerRef.current = new MessageHandler();
+  }, []);
 
   const startGame = React.useCallback(async () => {
     setGame((it: GameState) => ({
@@ -42,24 +52,29 @@ const useGameLogic = () => {
     setGame((it) => ({ ...it, countdown: null }));
 
     const startTime = Date.now();
+    messageHandlerRef?.current?.playersStartRiding();
 
     interval.current = setInterval(() => {
+      const ticks: Ticks = messageHandlerRef.current?.getTicks() as any;
       setP1State((s) => ({
         ...s,
-        distance: Math.min(s.distance + 2, 400),
+        distance: Math.min(ticks.p1TickCount / 5, 400),
         time: s.finished ? s.time : (Date.now() - startTime) / 1000,
-        finished: s.distance + 2 >= 400,
+        finished: ticks.p1TickCount / 5 >= 400,
+        speed: ticks.p2TicksPerHour / 5000,
       }));
       setP2State((s) => ({
         ...s,
-        distance: Math.min(s.distance + 1.8, 400),
+        distance: Math.min(ticks.p2TickCount / 5, 400),
         time: s.finished ? s.time : (Date.now() - startTime) / 1000,
-        finished: s.distance + 1.8 >= 400,
+        finished: ticks.p2TickCount / 5 >= 400,
+        speed: ticks.p2TicksPerHour / 5000,
       }));
     }, 100);
   }, [setP1State, setP2State, setGame]);
 
   const resetGame = React.useCallback(() => {
+    messageHandlerRef.current?.reset();
     clearInterval(interval.current);
     setGame(initialGameState);
     setP1State(initialPlayerState("Raipe"));
