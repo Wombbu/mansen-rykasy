@@ -1,5 +1,5 @@
 import * as React from "react";
-import styled, {keyframes, css} from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { PlayerState } from "./state";
 
 const blink = keyframes`
@@ -30,15 +30,20 @@ const PlayerInput = styled.input`
   max-width: 300px;
 `;
 
-const Time = styled.h1<{blink: boolean}>`
-  ${p => p.blink ? css`animation: ${blink} 1s step-start infinite` : ''}
+const Time = styled.h1<{ blink: boolean }>`
+  ${(p) =>
+    p.blink
+      ? css`
+          animation: ${blink} 1s step-start infinite;
+        `
+      : ""}
 `;
 
 export const PlayerInfo = ({
   bg,
   onChangePlayerName,
   pState,
-  winner
+  winner,
 }: {
   bg: string;
   onChangePlayerName: (event: any) => void;

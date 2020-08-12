@@ -15,6 +15,9 @@ export const Title = styled.h1`
   padding-top: 16px;
   text-align: center;
   font-size: 64px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 export const StartButton = styled.button`

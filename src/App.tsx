@@ -17,8 +17,9 @@ import {
   BottomContainer,
   StartButton,
 } from "./App.styles";
+import { Settings } from "./Settings";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const useGameLogic = () => {
   const [p1, setP1State] = useRecoilState(p1State);
@@ -32,13 +33,13 @@ const useGameLogic = () => {
       state: "PLAYING",
     }));
 
-    setGame(it => ({...it, countdown: 3}));
+    setGame((it) => ({ ...it, countdown: 3 }));
     await sleep(1000);
-    setGame(it => ({...it, countdown: 2}));
+    setGame((it) => ({ ...it, countdown: 2 }));
     await sleep(1000);
-    setGame(it => ({...it, countdown: 1}));
+    setGame((it) => ({ ...it, countdown: 1 }));
     await sleep(1000);
-    setGame(it => ({...it, countdown: null}));
+    setGame((it) => ({ ...it, countdown: null }));
 
     const startTime = Date.now();
 
@@ -47,13 +48,13 @@ const useGameLogic = () => {
         ...s,
         distance: Math.min(s.distance + 2, 400),
         time: s.finished ? s.time : (Date.now() - startTime) / 1000,
-        finished: s.distance + 2 >= 400
+        finished: s.distance + 2 >= 400,
       }));
       setP2State((s) => ({
         ...s,
         distance: Math.min(s.distance + 1.8, 400),
         time: s.finished ? s.time : (Date.now() - startTime) / 1000,
-        finished: s.distance + 1.8 >= 400
+        finished: s.distance + 1.8 >= 400,
       }));
     }, 100);
   }, [setP1State, setP2State, setGame]);
@@ -95,9 +96,18 @@ const App = () => {
     setP2State({ ...p2, name: event.target.value });
   };
 
+  const [settingsVisible, setSettingsVisible] = React.useState(false);
+
   return (
     <AppContainer>
-      <Title> {game.countdown ? game.countdown : game.state === 'IDLE' ? 'MANSEN RYKÄSY' : 'RYKII RYKII!'} </Title>
+      {settingsVisible && <Settings />}
+      <Title onClick={() => setSettingsVisible((it) => !it)}>
+        {game.countdown
+          ? game.countdown
+          : game.state === "IDLE"
+          ? "MANSEN RYKÄSY"
+          : "RYKII RYKII!"}
+      </Title>
       <Track p1State={p1} p2State={p2} game={game} />
       <BottomContainer>
         <PlayerInfo
