@@ -51,6 +51,8 @@ export interface Ticks {
   p2TickCount: number;
   p1TicksPerHour: number;
   p2TicksPerHour: number;
+  p1FinishingTime: number | null;
+  p2FinishingTime: number | null;
 }
 
 export class MessageHandler {
@@ -59,14 +61,22 @@ export class MessageHandler {
   p1TickPerHourCounter: any = undefined;
   p2TickPerHourCounter: any = undefined;
   apiSimulator: any = undefined;
+  tickCountToFinish: number = 0;
+  p1FinishingTime: number | null = null;
+  p2FinishingTime: number | null = null;
   reset() {
     this.apiSimulator.reset();
     this.p1TickPerHourCounter.reset();
     this.p2TickPerHourCounter.reset();
+    this.p1FinishingTime = null;
+    this.p2FinishingTime = null;
   }
   playersStartRiding() {
     // Just for debugging. Not needed in final product
     this.apiSimulator.playersStartRiding();
+  }
+  setTickCountToFinish(tickCountToFinish: number) {
+    this.tickCountToFinish = tickCountToFinish
   }
   getTicks() {
     return {
@@ -74,6 +84,8 @@ export class MessageHandler {
       p2TickCount: this.p2TickCount,
       p1TicksPerHour: this.p1TickPerHourCounter.getTicksPerHour(),
       p2TicksPerHour: this.p2TickPerHourCounter.getTicksPerHour(),
+      p1FinishingTime: this.p1FinishingTime,
+      p2FinishingTime: this.p2FinishingTime
     };
   }
   constructor() {
@@ -85,6 +97,12 @@ export class MessageHandler {
       that.p2TickPerHourCounter.onNewTickCount(p2);
       that.p1TickCount = p1;
       that.p2TickCount = p2;
+      if (p1 >= that.tickCountToFinish && !that.p1FinishingTime) {
+        that.p1FinishingTime = Date.now();
+      }
+      if (p2 >= that.tickCountToFinish && !that.p2FinishingTime) {
+        that.p2FinishingTime = Date.now();
+      } 
     }
     this.apiSimulator = ApiSimulator(messageHandler);
   }

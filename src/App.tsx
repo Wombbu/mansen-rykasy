@@ -31,6 +31,7 @@ const useGameLogic = () => {
     reset: () => void;
     playersStartRiding: () => void;
     getTicks: () => Ticks;
+    setTickCountToFinish: (count: number) => void
   }>();
 
   React.useEffect(() => {
@@ -52,6 +53,7 @@ const useGameLogic = () => {
     setGame((it) => ({ ...it, countdown: null }));
 
     const startTime = Date.now();
+    messageHandlerRef?.current?.setTickCountToFinish(400 * 5);
     messageHandlerRef?.current?.playersStartRiding();
 
     interval.current = setInterval(() => {
@@ -59,14 +61,14 @@ const useGameLogic = () => {
       setP1State((s) => ({
         ...s,
         distance: Math.min(ticks.p1TickCount / 5, 400),
-        time: s.finished ? s.time : (Date.now() - startTime) / 1000,
-        finished: ticks.p1TickCount / 5 >= 400,
-        speed: ticks.p2TicksPerHour / 5000,
+        time: ticks.p1FinishingTime != null ? (ticks.p1FinishingTime - startTime) / 1000 : (Date.now() - startTime) / 1000,
+        finished: ticks.p1FinishingTime != null,
+        speed: ticks.p1TicksPerHour / 5000,
       }));
       setP2State((s) => ({
         ...s,
         distance: Math.min(ticks.p2TickCount / 5, 400),
-        time: s.finished ? s.time : (Date.now() - startTime) / 1000,
+        time: ticks.p2FinishingTime != null ? (ticks.p2FinishingTime - startTime) / 1000 : (Date.now() - startTime) / 1000,
         finished: ticks.p2TickCount / 5 >= 400,
         speed: ticks.p2TicksPerHour / 5000,
       }));

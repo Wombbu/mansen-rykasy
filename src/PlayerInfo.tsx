@@ -59,6 +59,6 @@ export const PlayerInfo = ({
     />
     <h1>{pState.speed.toFixed()} km/h</h1>
     <h1>{pState.distance.toFixed()} / 400m</h1>
-    <Time blink={winner}>{pState.time.toFixed(1)} s</Time>
+    <Time blink={winner}>{pState.time.toFixed(pState.finished ? 3 : 1)} s</Time>
   </PlayerInfoContainer>
 );
