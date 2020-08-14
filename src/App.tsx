@@ -31,7 +31,7 @@ const useGameLogic = () => {
     reset: () => void;
     start: () => void;
     getTicks: () => Ticks;
-    setTickCountToFinish: (count: number) => void
+    setTickCountToFinish: (count: number) => void;
   }>();
 
   React.useEffect(() => {
@@ -44,7 +44,8 @@ const useGameLogic = () => {
       state: "PLAYING",
     }));
 
-    
+    messageHandlerRef.current?.reset();
+
     setGame((it) => ({ ...it, countdown: 3 }));
     await sleep(1000);
     setGame((it) => ({ ...it, countdown: 2 }));
@@ -52,7 +53,7 @@ const useGameLogic = () => {
     setGame((it) => ({ ...it, countdown: 1 }));
     await sleep(1000);
     setGame((it) => ({ ...it, countdown: null }));
-    
+
     messageHandlerRef?.current?.setTickCountToFinish(400 * 8);
     messageHandlerRef?.current?.start();
 
@@ -63,14 +64,20 @@ const useGameLogic = () => {
       setP1State((s) => ({
         ...s,
         distance: Math.min(ticks.p1TickCount / 8, 400),
-        time: ticks.p1FinishingTime != null ? (ticks.p1FinishingTime - startTime) / 1000 : (Date.now() - startTime) / 1000,
+        time:
+          ticks.p1FinishingTime != null
+            ? (ticks.p1FinishingTime - startTime) / 1000
+            : (Date.now() - startTime) / 1000,
         finished: ticks.p1FinishingTime != null,
         speed: ticks.p1TicksPerHour / 8000,
       }));
       setP2State((s) => ({
         ...s,
         distance: Math.min(ticks.p2TickCount / 8, 400),
-        time: ticks.p2FinishingTime != null ? (ticks.p2FinishingTime - startTime) / 1000 : (Date.now() - startTime) / 1000,
+        time:
+          ticks.p2FinishingTime != null
+            ? (ticks.p2FinishingTime - startTime) / 1000
+            : (Date.now() - startTime) / 1000,
         finished: ticks.p2TickCount / 8 >= 400,
         speed: ticks.p2TicksPerHour / 8000,
       }));

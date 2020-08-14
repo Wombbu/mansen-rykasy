@@ -1,17 +1,17 @@
-import Paho from 'paho-mqtt';
+import Paho from "paho-mqtt";
 
-class ApiSimulator {
+class Api {
   client: any = null;
 
   reset() {
     // Ei tarvetta resetille?
-  };
+  }
 
   start() {
-    this.client.subscribe('p1');
-    this.client.subscribe('p2');
+    this.client.subscribe("p1");
+    this.client.subscribe("p2");
     this.client.send("kerhosprint_commands", "start_race");
-  };
+  }
 
   constructor(messageHandler: any) {
     var messageHandlerSelf = this;
@@ -20,7 +20,7 @@ class ApiSimulator {
     messageHandlerSelf.client.onMessageArrived = messageHandler;
     messageHandlerSelf.client.connect();
   }
-};
+}
 
 const createTicksPerHourCounter = () => ({
   lastCountTimestamp: 0,
@@ -44,6 +44,7 @@ const createTicksPerHourCounter = () => ({
   reset() {
     this.lastCountTimestamp = 0;
     this.lastCount = 0;
+    this.ticksPerHour = 0;
   },
   getTicksPerHour() {
     return this.ticksPerHour;
@@ -69,6 +70,8 @@ export class MessageHandler {
   p1FinishingTime: number | null = null;
   p2FinishingTime: number | null = null;
   reset() {
+    this.p1TickCount = 0;
+    this.p2TickCount = 0;
     this.apiSimulator.reset();
     this.p1TickPerHourCounter.reset();
     this.p2TickPerHourCounter.reset();
@@ -80,7 +83,7 @@ export class MessageHandler {
     this.apiSimulator.start();
   }
   setTickCountToFinish(tickCountToFinish: number) {
-    this.tickCountToFinish = tickCountToFinish
+    this.tickCountToFinish = tickCountToFinish;
   }
   getTicks() {
     return {
@@ -89,7 +92,7 @@ export class MessageHandler {
       p1TicksPerHour: this.p1TickPerHourCounter.getTicksPerHour(),
       p2TicksPerHour: this.p2TickPerHourCounter.getTicksPerHour(),
       p1FinishingTime: this.p1FinishingTime,
-      p2FinishingTime: this.p2FinishingTime
+      p2FinishingTime: this.p2FinishingTime,
     };
   }
   constructor() {
@@ -97,21 +100,28 @@ export class MessageHandler {
     this.p2TickPerHourCounter = createTicksPerHourCounter();
     var that = this;
     function messageHandler(message: any) {
-      console.log(message);
-      const count = message.payloadString;
+      const topic = message.destinationName;
+      const count = Number(message.payloadString);
 
-      that.p1TickPerHourCounter.onNewTickCount(count);
-      that.p2TickPerHourCounter.onNewTickCount(0);
-      that.p1TickCount = Number(count);
-      that.p2TickCount = 0;
-      if (that.p1TickCount >= that.tickCountToFinish && !that.p1FinishingTime) {
-        that.p1FinishingTime = Date.now();
+      if (topic === "p1") {
+        that.p1TickPerHourCounter.onNewTickCount(count);
+        that.p1TickCount = count;
+
+        if (
+          that.p1TickCount >= that.tickCountToFinish &&
+          !that.p1FinishingTime
+        ) {
+          that.p1FinishingTime = Date.now();
+        }
+      } else if (topic === "p2") {
+        that.p2TickPerHourCounter.onNewTickCount(count);
+        that.p2TickCount = count;
+
+        if (count >= that.tickCountToFinish && !that.p2FinishingTime) {
+          that.p2FinishingTime = Date.now();
+        }
       }
-
-      if (0 >= that.tickCountToFinish && !that.p2FinishingTime) {
-        that.p2FinishingTime = Date.now();
-      } 
     }
-    this.apiSimulator = new ApiSimulator(messageHandler);
+    this.apiSimulator = new Api(messageHandler);
   }
 }
