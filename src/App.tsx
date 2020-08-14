@@ -29,7 +29,7 @@ const useGameLogic = () => {
   const interval = React.useRef<any>();
   const messageHandlerRef = React.useRef<{
     reset: () => void;
-    playersStartRiding: () => void;
+    start: () => void;
     getTicks: () => Ticks;
     setTickCountToFinish: (count: number) => void
   }>();
@@ -44,6 +44,7 @@ const useGameLogic = () => {
       state: "PLAYING",
     }));
 
+    
     setGame((it) => ({ ...it, countdown: 3 }));
     await sleep(1000);
     setGame((it) => ({ ...it, countdown: 2 }));
@@ -51,26 +52,27 @@ const useGameLogic = () => {
     setGame((it) => ({ ...it, countdown: 1 }));
     await sleep(1000);
     setGame((it) => ({ ...it, countdown: null }));
+    
+    messageHandlerRef?.current?.setTickCountToFinish(400 * 8);
+    messageHandlerRef?.current?.start();
 
     const startTime = Date.now();
-    messageHandlerRef?.current?.setTickCountToFinish(400 * 5);
-    messageHandlerRef?.current?.playersStartRiding();
 
     interval.current = setInterval(() => {
       const ticks: Ticks = messageHandlerRef.current?.getTicks() as any;
       setP1State((s) => ({
         ...s,
-        distance: Math.min(ticks.p1TickCount / 5, 400),
+        distance: Math.min(ticks.p1TickCount / 8, 400),
         time: ticks.p1FinishingTime != null ? (ticks.p1FinishingTime - startTime) / 1000 : (Date.now() - startTime) / 1000,
         finished: ticks.p1FinishingTime != null,
-        speed: ticks.p1TicksPerHour / 5000,
+        speed: ticks.p1TicksPerHour / 8000,
       }));
       setP2State((s) => ({
         ...s,
-        distance: Math.min(ticks.p2TickCount / 5, 400),
+        distance: Math.min(ticks.p2TickCount / 8, 400),
         time: ticks.p2FinishingTime != null ? (ticks.p2FinishingTime - startTime) / 1000 : (Date.now() - startTime) / 1000,
-        finished: ticks.p2TickCount / 5 >= 400,
-        speed: ticks.p2TicksPerHour / 5000,
+        finished: ticks.p2TickCount / 8 >= 400,
+        speed: ticks.p2TicksPerHour / 8000,
       }));
     }, 100);
   }, [setP1State, setP2State, setGame]);

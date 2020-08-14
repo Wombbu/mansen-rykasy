@@ -1,38 +1,24 @@
 import Paho from 'paho-mqtt';
 
 class ApiSimulator {
-  // interval: any;
-  countP1: number;
-  countP2: number;
   client: any = null;
 
   reset() {
-    // clearInterval(this.interval);
-    this.countP1 = 0;
-    this.countP2 = 0;
+    // Ei tarvetta resetille?
   };
-  playersStartRiding() {
+
+  start() {
+    this.client.subscribe('p1');
+    this.client.subscribe('p2');
     this.client.send("kerhosprint_commands", "start_race");
-    // Just for debugging. Not needed in final products
-    // this.interval = setInterval(() => {
-      // this.countP1++;
-      // this.countP2 += 2;
-      // messageHandler({ p1: this.countP1, p2: this.countP2 });
-    // }, 20);
   };
 
   constructor(messageHandler: any) {
     var messageHandlerSelf = this;
-    // this.interval = 0;
-    this.countP1 = 0;
-    this.countP2 = 0;
-
     messageHandlerSelf.client = new Paho.Client("192.168.10.47", 9001, "lauri");
-    messageHandlerSelf.client.connect()
-
-    // Set callback handlers
     messageHandlerSelf.client.onConnectionLost = console.log;
     messageHandlerSelf.client.onMessageArrived = messageHandler;
+    messageHandlerSelf.client.connect();
   }
 };
 
@@ -89,9 +75,9 @@ export class MessageHandler {
     this.p1FinishingTime = null;
     this.p2FinishingTime = null;
   }
-  playersStartRiding() {
+  start() {
     // Just for debugging. Not needed in final product
-    this.apiSimulator.playersStartRiding();
+    this.apiSimulator.start();
   }
   setTickCountToFinish(tickCountToFinish: number) {
     this.tickCountToFinish = tickCountToFinish
@@ -112,16 +98,17 @@ export class MessageHandler {
     var that = this;
     function messageHandler(message: any) {
       console.log(message);
-      const {p1, p2} = message;
+      const count = message.payloadString;
 
-      that.p1TickPerHourCounter.onNewTickCount(p1);
-      that.p2TickPerHourCounter.onNewTickCount(p2);
-      that.p1TickCount = p1;
-      that.p2TickCount = p2;
-      if (p1 >= that.tickCountToFinish && !that.p1FinishingTime) {
+      that.p1TickPerHourCounter.onNewTickCount(count);
+      that.p2TickPerHourCounter.onNewTickCount(0);
+      that.p1TickCount = Number(count);
+      that.p2TickCount = 0;
+      if (that.p1TickCount >= that.tickCountToFinish && !that.p1FinishingTime) {
         that.p1FinishingTime = Date.now();
       }
-      if (p2 >= that.tickCountToFinish && !that.p2FinishingTime) {
+
+      if (0 >= that.tickCountToFinish && !that.p2FinishingTime) {
         that.p2FinishingTime = Date.now();
       } 
     }
