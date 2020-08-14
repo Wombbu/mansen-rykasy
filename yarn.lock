@@ -1612,6 +1612,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.54.tgz#a4b58d8df3a4677b6c08bfbc94b7ad7a7a5f82d1"
   integrity sha512-ge4xZ3vSBornVYlDnk7yZ0gK6ChHf/CHB7Gl1I0Jhah8DDnEQqBzgohYG4FX4p81TNirSETOiSyn+y1r9/IR6w==
 
+"@types/paho-mqtt@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/paho-mqtt/-/paho-mqtt-1.0.4.tgz#e5bb9f1d742e3a60baf90ade083cb89979c7cc3e"
+  integrity sha512-6dr4CEFZESwhY278sg0vTazsnAdwmloD5edD/7jCkBS5chKhtdStNpdLlaPdbTqmEeOhsEb+NJYVKbJF5sArBg==
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
@@ -7488,6 +7493,16 @@ p-try@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
+
+paho-mqtt@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/paho-mqtt/-/paho-mqtt-1.1.0.tgz#8c10e29eb162e966fb15188d965c3dce505de9d9"
+  integrity sha512-KPbL9KAB0ASvhSDbOrZBaccXS+/s7/LIofbPyERww8hM5Ko71GUJQ6Nmg0BWqj8phAIT8zdf/Sd/RftHU9i2HA==
+
+paho@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/paho/-/paho-1.0.0.tgz#43caf1fef8fc6b313416a0e3095f640645e83ed1"
+  integrity sha1-Q8rx/vj8azE0FqDjCV9kBkXoPtE=
 
 pako@~1.0.5:
   version "1.0.11"

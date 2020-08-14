@@ -1,22 +1,40 @@
-const ApiSimulator = (messageHandler: any) => ({
-  interval: 0,
-  countP1: 0,
-  countP2: 0,
+import Paho from 'paho-mqtt';
+
+class ApiSimulator {
+  // interval: any;
+  countP1: number;
+  countP2: number;
+  client: any = null;
 
   reset() {
-    clearInterval(this.interval);
+    // clearInterval(this.interval);
     this.countP1 = 0;
     this.countP2 = 0;
-  },
+  };
   playersStartRiding() {
+    this.client.send("kerhosprint_commands", "start_race");
     // Just for debugging. Not needed in final products
-    this.interval = setInterval(() => {
-      this.countP1++;
-      this.countP2 += 2;
-      messageHandler({ p1: this.countP1, p2: this.countP2 });
-    }, 20);
-  },
-});
+    // this.interval = setInterval(() => {
+      // this.countP1++;
+      // this.countP2 += 2;
+      // messageHandler({ p1: this.countP1, p2: this.countP2 });
+    // }, 20);
+  };
+
+  constructor(messageHandler: any) {
+    var messageHandlerSelf = this;
+    // this.interval = 0;
+    this.countP1 = 0;
+    this.countP2 = 0;
+
+    messageHandlerSelf.client = new Paho.Client("192.168.10.47", 9001, "lauri");
+    messageHandlerSelf.client.connect()
+
+    // Set callback handlers
+    messageHandlerSelf.client.onConnectionLost = console.log;
+    messageHandlerSelf.client.onMessageArrived = messageHandler;
+  }
+};
 
 const createTicksPerHourCounter = () => ({
   lastCountTimestamp: 0,
@@ -92,7 +110,10 @@ export class MessageHandler {
     this.p1TickPerHourCounter = createTicksPerHourCounter();
     this.p2TickPerHourCounter = createTicksPerHourCounter();
     var that = this;
-    function messageHandler({ p1, p2 }: { p1: number; p2: number }) {
+    function messageHandler(message: any) {
+      console.log(message);
+      const {p1, p2} = message;
+
       that.p1TickPerHourCounter.onNewTickCount(p1);
       that.p2TickPerHourCounter.onNewTickCount(p2);
       that.p1TickCount = p1;
@@ -104,6 +125,6 @@ export class MessageHandler {
         that.p2FinishingTime = Date.now();
       } 
     }
-    this.apiSimulator = ApiSimulator(messageHandler);
+    this.apiSimulator = new ApiSimulator(messageHandler);
   }
 }
