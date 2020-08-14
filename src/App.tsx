@@ -20,6 +20,14 @@ import {
 import { Settings } from "./Settings";
 import { MessageHandler, Ticks } from "./messageHandler";
 
+const MAGNET_COUNT = 1;
+const RACE_DISTANCE = 400;
+const ROLLER_DIAMETER_METERS = 0.0787;
+const TICKS_PER_METER = MAGNET_COUNT / (ROLLER_DIAMETER_METERS * Math.PI);
+
+const SCROLLER_TEXT =
+  "CREATED FOR 1v12v by LAURI & LEEVI - Enjoy the afterparty! - Greetings to: Leo - Joonas - tutam - sairaannopee - tahmatassu - :) - oulufixed - Lahti - Kokkola - Ylämäkivaihteettomat - Sponsored by: Pelago - Bike Polo Tampere - Red Lights - Pyöräkauppa Keskiö - Yksivaihde.net";
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const useGameLogic = () => {
@@ -54,7 +62,9 @@ const useGameLogic = () => {
     await sleep(1000);
     setGame((it) => ({ ...it, countdown: null }));
 
-    messageHandlerRef?.current?.setTickCountToFinish(400 * 8);
+    messageHandlerRef?.current?.setTickCountToFinish(
+      RACE_DISTANCE * TICKS_PER_METER
+    );
     messageHandlerRef?.current?.start();
 
     const startTime = Date.now();
@@ -63,23 +73,23 @@ const useGameLogic = () => {
       const ticks: Ticks = messageHandlerRef.current?.getTicks() as any;
       setP1State((s) => ({
         ...s,
-        distance: Math.min(ticks.p1TickCount / 8, 400),
+        distance: Math.min(ticks.p1TickCount / TICKS_PER_METER, RACE_DISTANCE),
         time:
           ticks.p1FinishingTime != null
             ? (ticks.p1FinishingTime - startTime) / 1000
             : (Date.now() - startTime) / 1000,
         finished: ticks.p1FinishingTime != null,
-        speed: ticks.p1TicksPerHour / 8000,
+        speed: ticks.p1TicksPerHour / (TICKS_PER_METER * 1000),
       }));
       setP2State((s) => ({
         ...s,
-        distance: Math.min(ticks.p2TickCount / 8, 400),
+        distance: Math.min(ticks.p2TickCount / TICKS_PER_METER, RACE_DISTANCE),
         time:
           ticks.p2FinishingTime != null
             ? (ticks.p2FinishingTime - startTime) / 1000
             : (Date.now() - startTime) / 1000,
-        finished: ticks.p2TickCount / 8 >= 400,
-        speed: ticks.p2TicksPerHour / 8000,
+        finished: ticks.p2FinishingTime != null,
+        speed: ticks.p2TicksPerHour / (TICKS_PER_METER * 1000),
       }));
     }, 100);
   }, [setP1State, setP2State, setGame]);
@@ -134,6 +144,10 @@ const App = () => {
           ? "MANSEN RYKÄSY"
           : "RYKII RYKII!"}
       </Title>
+      {React.createElement("marquee", {
+        children: SCROLLER_TEXT,
+        style: { visibility: game.state === "IDLE" ? "visible" : "hidden" },
+      })}
       <Track p1State={p1} p2State={p2} game={game} />
       <BottomContainer>
         <PlayerInfo
@@ -143,6 +157,7 @@ const App = () => {
           winner={p1.finished && p1.time < p2.time}
         ></PlayerInfo>
         <StartButton
+          disabled={game.countdown != null}
           onClick={() => {
             switch (game.state) {
               case "IDLE":
