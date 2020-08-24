@@ -70,8 +70,10 @@ const useGameLogic = () => {
       await sleep(1000);
       setGame((it) => ({ ...it, countdown: null }));
 
+      const ticksPerMeter = calculateTicksPerMeter(rollDiameterMm);
+
       messageHandlerRef?.current?.setTickCountToFinish(
-        raceDistanceM * calculateTicksPerMeter(rollDiameterMm)
+        raceDistanceM * ticksPerMeter
       );
 
       messageHandlerRef?.current?.start();
@@ -83,28 +85,28 @@ const useGameLogic = () => {
         setP1State((s) => ({
           ...s,
           distance: Math.min(
-            ticks.p1TickCount / TICKS_PER_METER,
-            RACE_DISTANCE
+            ticks.p1TickCount / ticksPerMeter,
+            raceDistanceM
           ),
           time:
             ticks.p1FinishingTime != null
               ? (ticks.p1FinishingTime - startTime) / 1000
               : (Date.now() - startTime) / 1000,
           finished: ticks.p1FinishingTime != null,
-          speed: ticks.p1TicksPerHour / (TICKS_PER_METER * 1000),
+          speed: ticks.p1TicksPerHour / (ticksPerMeter * 1000),
         }));
         setP2State((s) => ({
           ...s,
           distance: Math.min(
-            ticks.p2TickCount / TICKS_PER_METER,
-            RACE_DISTANCE
+            ticks.p2TickCount / ticksPerMeter,
+            raceDistanceM
           ),
           time:
             ticks.p2FinishingTime != null
               ? (ticks.p2FinishingTime - startTime) / 1000
               : (Date.now() - startTime) / 1000,
           finished: ticks.p2FinishingTime != null,
-          speed: ticks.p2TicksPerHour / (TICKS_PER_METER * 1000),
+          speed: ticks.p2TicksPerHour / (ticksPerMeter * 1000),
         }));
       }, 100);
     },
