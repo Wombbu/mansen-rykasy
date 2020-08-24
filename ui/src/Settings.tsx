@@ -2,7 +2,8 @@ import * as React from "react";
 import { useRecoilState } from "recoil";
 import { gameOptions } from "./state";
 
-export const Settings = () => {
+export const Settings = ({connect}: {  connect: (url: string, port: number) => void;
+}) => {
   const [options, setOptions] = useRecoilState(gameOptions);
 
   return (
@@ -31,6 +32,9 @@ export const Settings = () => {
           setOptions((it) => ({ ...it, rollDiameterMm: e.target.value }))
         }
       />
+      <button onClick={() => {
+        connect(options.serverAddress, Number(options.serverPort));
+      }}>Connect</button>
     </div>
   );
 };

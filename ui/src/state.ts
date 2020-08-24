@@ -51,8 +51,8 @@ export interface GameOptions {
 export const gameOptions = atom({
   key: "gameOptions",
   default: {
-    serverAddress: "www.google.fi",
-    serverPort: "8080",
+    serverAddress: "mansen.rykasy",
+    serverPort: "9001",
     rollDiameterMm: "80",
     totalDistance: 400,
   },

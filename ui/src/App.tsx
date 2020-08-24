@@ -40,6 +40,7 @@ const useGameLogic = () => {
     start: () => void;
     getTicks: () => Ticks;
     setTickCountToFinish: (count: number) => void;
+    connect: (url: string, port: number) => void;
   }>();
 
   React.useEffect(() => {
@@ -104,6 +105,10 @@ const useGameLogic = () => {
     setP2State(initialPlayerState("Juti"));
   }, [setGame, setP1State, setP2State]);
 
+  const connect = React.useCallback((url: string, port: number) => {
+    messageHandlerRef.current?.connect(url, port);
+  }, [messageHandlerRef]);
+
   return {
     p1,
     setP1State,
@@ -112,6 +117,7 @@ const useGameLogic = () => {
     startGame,
     resetGame,
     game,
+    connect,
   };
 };
 
@@ -124,6 +130,7 @@ const App = () => {
     startGame,
     resetGame,
     game,
+    connect,
   } = useGameLogic();
 
   const onChangeP1Name = (event: any) => {
@@ -138,7 +145,7 @@ const App = () => {
 
   return (
     <AppContainer>
-      {settingsVisible && <Settings />}
+      {settingsVisible && <Settings connect={connect} />}
       <Title onClick={() => setSettingsVisible((it) => !it)}>
         {game.countdown
           ? game.countdown

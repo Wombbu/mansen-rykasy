@@ -1,26 +1,37 @@
 import Paho from "paho-mqtt";
 
 /**
- * 
+ *
  */
 class Api {
   client: any = null;
+  messageHandler: any = null;
 
   reset() {
-    // No need for reset?
-  }
-
-  start() {
-    this.client.subscribe("p1");
-    this.client.subscribe("p2");
+    // This resets the back end tick counter
     this.client.send("kerhosprint_commands", "start_race");
   }
 
-  constructor(messageHandler: any) {
-    this.client = new Paho.Client("192.168.10.47", 9001, "client_id");
-    this.client.onConnectionLost = alert;
-    this.client.onMessageArrived = messageHandler;
+  start() {
+    this.client.send("kerhosprint_commands", "start_race");
+    this.client.subscribe("p1");
+    this.client.subscribe("p2");
+  }
+
+  connect(url: string, port: number) {
+    if(this.client != null) {
+      // Disconnect old session first if possible
+      this.client?.end(true);
+    }
+
+    this.client = new Paho.Client(url, port, "client_id");
+    this.client.onConnectionLost = console.error;
+    this.client.onMessageArrived = this.messageHandler;
     this.client.connect();
+  }
+
+  constructor(messageHandler: any) {
+    this.messageHandler = messageHandler;
   }
 }
 
@@ -67,23 +78,24 @@ export class MessageHandler {
   p2TickCount = 0;
   p1TickPerHourCounter: any = undefined;
   p2TickPerHourCounter: any = undefined;
-  apiSimulator: any = undefined;
+  api: any = undefined;
   tickCountToFinish: number = 0;
   p1FinishingTime: number | null = null;
   p2FinishingTime: number | null = null;
   reset() {
     this.p1TickCount = 0;
     this.p2TickCount = 0;
-    this.apiSimulator.reset();
+    this.api.reset();
     this.p1TickPerHourCounter.reset();
     this.p2TickPerHourCounter.reset();
     this.p1FinishingTime = null;
     this.p2FinishingTime = null;
-    // This just resets the count
-    this.apiSimulator.start();
+  }
+  connect(url: string, port: number) {
+    this.api.connect(url, port);
   }
   start() {
-    this.apiSimulator.start();
+    this.api.start();
   }
   setTickCountToFinish(tickCountToFinish: number) {
     this.tickCountToFinish = tickCountToFinish;
@@ -125,6 +137,6 @@ export class MessageHandler {
         }
       }
     }
-    this.apiSimulator = new Api(messageHandler);
+    this.api = new Api(messageHandler);
   }
 }
