@@ -2,7 +2,10 @@ import * as React from "react";
 import { useRecoilState } from "recoil";
 import { gameOptions } from "./state";
 
-export const Settings = ({connect}: {  connect: (url: string, port: number) => void;
+export const Settings = ({
+  connect,
+}: {
+  connect: (url: string, port: number) => void;
 }) => {
   const [options, setOptions] = useRecoilState(gameOptions);
 
@@ -40,9 +43,13 @@ export const Settings = ({connect}: {  connect: (url: string, port: number) => v
           setOptions((it) => ({ ...it, raceDistanceM: e.target.value }))
         }
       />
-      <button onClick={() => {
-        connect(options.serverAddress, Number(options.serverPort));
-      }}>Connect</button>
+      <button
+        onClick={() => {
+          connect(options.serverAddress, Number(options.serverPort));
+        }}
+      >
+        Connect
+      </button>
     </div>
   );
 };

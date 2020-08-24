@@ -19,15 +19,24 @@ class Api {
   }
 
   connect(url: string, port: number) {
-    if(this.client != null) {
-      // Disconnect old session first if possible
-      this.client?.end(true);
+    if (this.client != null) {
+      try{
+        // Disconnect old session first if possible
+        this.client?.disconnect();
+      } catch(e) {
+        console.error('client already disconnected')
+      }
     }
 
     this.client = new Paho.Client(url, port, "client_id");
     this.client.onConnectionLost = console.error;
     this.client.onMessageArrived = this.messageHandler;
-    this.client.connect();
+    this.client.connect({
+      cleanSession: true,
+      reconnect: true,
+      onFailure: alert,
+      onSuccess: () => console.log("connected"),
+    });
   }
 
   constructor(messageHandler: any) {

@@ -44,11 +44,13 @@ export const PlayerInfo = ({
   onChangePlayerName,
   pState,
   winner,
+  raceDistanceM,
 }: {
   bg: string;
   onChangePlayerName: (event: any) => void;
   pState: PlayerState;
   winner: boolean;
+  raceDistanceM: number;
 }) => (
   <PlayerInfoContainer bg={bg}>
     <PlayerInput
@@ -57,8 +59,16 @@ export const PlayerInfo = ({
       type="text"
       value={pState.name}
     />
-    <h1>{pState.finished ? 'AVG' : ''} {pState.finished ? (400 / pState.time * 3.6).toFixed(1)  : pState.speed.toFixed()} km/h</h1>
-    <h1>{pState.distance.toFixed()} / 400m</h1>
+    <h1>
+      {pState.finished ? "AVG" : ""}{" "}
+      {pState.finished
+        ? ((raceDistanceM / pState.time) * 3.6).toFixed(1)
+        : pState.speed.toFixed()}{" "}
+      km/h
+    </h1>
+    <h1>
+      {pState.distance.toFixed()} / {raceDistanceM}m
+    </h1>
     <Time blink={winner}>{pState.time.toFixed(pState.finished ? 3 : 1)} s</Time>
   </PlayerInfoContainer>
 );

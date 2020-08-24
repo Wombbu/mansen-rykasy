@@ -9,7 +9,7 @@ import {
   initialGameState,
   initialPlayerState,
   GameState,
-  gameOptions
+  gameOptions,
 } from "./state";
 import { PlayerInfo } from "./PlayerInfo";
 import {
@@ -31,7 +31,8 @@ const SCROLLER_TEXT =
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const calculateTicksPerMeter = (rollerDiameterMm: number) => MAGNET_COUNT / ((rollerDiameterMm / 1000) * Math.PI);
+const calculateTicksPerMeter = (rollerDiameterMm: number) =>
+  MAGNET_COUNT / ((rollerDiameterMm / 1000) * Math.PI);
 
 const useGameLogic = () => {
   const [p1, setP1State] = useRecoilState(p1State);
@@ -50,56 +51,65 @@ const useGameLogic = () => {
     messageHandlerRef.current = new MessageHandler();
   }, []);
 
-  const startGame = React.useCallback(async (raceDistanceM: number, rollDiameterMm: number) => {
-    setGame((it: GameState) => ({
-      ...it,
-      state: "PLAYING",
-    }));
-
-    // Reset just in case someone has ridden over race distance between races
-    // otherwise we would prolly get finishingTime in the first payload
-    messageHandlerRef.current?.reset();
-
-    setGame((it) => ({ ...it, countdown: 3 }));
-    await sleep(1000);
-    setGame((it) => ({ ...it, countdown: 2 }));
-    await sleep(1000);
-    setGame((it) => ({ ...it, countdown: 1 }));
-    await sleep(1000);
-    setGame((it) => ({ ...it, countdown: null }));
-
-    messageHandlerRef?.current?.setTickCountToFinish(
-      raceDistanceM * calculateTicksPerMeter(rollDiameterMm)
-    );
-
-    messageHandlerRef?.current?.start();
-
-    const startTime = Date.now();
-
-    interval.current = setInterval(() => {
-      const ticks: Ticks = messageHandlerRef.current?.getTicks() as any;
-      setP1State((s) => ({
-        ...s,
-        distance: Math.min(ticks.p1TickCount / TICKS_PER_METER, RACE_DISTANCE),
-        time:
-          ticks.p1FinishingTime != null
-            ? (ticks.p1FinishingTime - startTime) / 1000
-            : (Date.now() - startTime) / 1000,
-        finished: ticks.p1FinishingTime != null,
-        speed: ticks.p1TicksPerHour / (TICKS_PER_METER * 1000),
+  const startGame = React.useCallback(
+    async (raceDistanceM: number, rollDiameterMm: number) => {
+      setGame((it: GameState) => ({
+        ...it,
+        state: "PLAYING",
       }));
-      setP2State((s) => ({
-        ...s,
-        distance: Math.min(ticks.p2TickCount / TICKS_PER_METER, RACE_DISTANCE),
-        time:
-          ticks.p2FinishingTime != null
-            ? (ticks.p2FinishingTime - startTime) / 1000
-            : (Date.now() - startTime) / 1000,
-        finished: ticks.p2FinishingTime != null,
-        speed: ticks.p2TicksPerHour / (TICKS_PER_METER * 1000),
-      }));
-    }, 100);
-  }, [setP1State, setP2State, setGame]);
+
+      // Reset just in case someone has ridden over race distance between races
+      // otherwise we would prolly get finishingTime in the first payload
+      messageHandlerRef.current?.reset();
+
+      setGame((it) => ({ ...it, countdown: 3 }));
+      await sleep(1000);
+      setGame((it) => ({ ...it, countdown: 2 }));
+      await sleep(1000);
+      setGame((it) => ({ ...it, countdown: 1 }));
+      await sleep(1000);
+      setGame((it) => ({ ...it, countdown: null }));
+
+      messageHandlerRef?.current?.setTickCountToFinish(
+        raceDistanceM * calculateTicksPerMeter(rollDiameterMm)
+      );
+
+      messageHandlerRef?.current?.start();
+
+      const startTime = Date.now();
+
+      interval.current = setInterval(() => {
+        const ticks: Ticks = messageHandlerRef.current?.getTicks() as any;
+        setP1State((s) => ({
+          ...s,
+          distance: Math.min(
+            ticks.p1TickCount / TICKS_PER_METER,
+            RACE_DISTANCE
+          ),
+          time:
+            ticks.p1FinishingTime != null
+              ? (ticks.p1FinishingTime - startTime) / 1000
+              : (Date.now() - startTime) / 1000,
+          finished: ticks.p1FinishingTime != null,
+          speed: ticks.p1TicksPerHour / (TICKS_PER_METER * 1000),
+        }));
+        setP2State((s) => ({
+          ...s,
+          distance: Math.min(
+            ticks.p2TickCount / TICKS_PER_METER,
+            RACE_DISTANCE
+          ),
+          time:
+            ticks.p2FinishingTime != null
+              ? (ticks.p2FinishingTime - startTime) / 1000
+              : (Date.now() - startTime) / 1000,
+          finished: ticks.p2FinishingTime != null,
+          speed: ticks.p2TicksPerHour / (TICKS_PER_METER * 1000),
+        }));
+      }, 100);
+    },
+    [setP1State, setP2State, setGame]
+  );
 
   const resetGame = React.useCallback(() => {
     messageHandlerRef.current?.reset();
@@ -109,9 +119,12 @@ const useGameLogic = () => {
     setP2State(initialPlayerState("Juti"));
   }, [setGame, setP1State, setP2State]);
 
-  const connect = React.useCallback((url: string, port: number) => {
-    messageHandlerRef.current?.connect(url, port);
-  }, [messageHandlerRef]);
+  const connect = React.useCallback(
+    (url: string, port: number) => {
+      messageHandlerRef.current?.connect(url, port);
+    },
+    [messageHandlerRef]
+  );
 
   return {
     p1,
@@ -170,13 +183,17 @@ const App = () => {
           onChangePlayerName={onChangeP1Name}
           bg="#01FFFF"
           winner={p1.finished && p1.time < p2.time}
+          raceDistanceM={options.raceDistanceM}
         ></PlayerInfo>
         <StartButton
           disabled={game.countdown != null}
           onClick={() => {
             switch (game.state) {
               case "IDLE":
-                startGame(options.raceDistanceM, Number(options.rollDiameterMm));
+                startGame(
+                  options.raceDistanceM,
+                  Number(options.rollDiameterMm)
+                );
                 break;
               case "PLAYING":
                 resetGame();
@@ -193,6 +210,7 @@ const App = () => {
           onChangePlayerName={onChangeP2Name}
           bg="#FD01FE"
           winner={p2.finished && p2.time < p1.time}
+          raceDistanceM={options.raceDistanceM}
         ></PlayerInfo>
       </BottomContainer>
     </AppContainer>
