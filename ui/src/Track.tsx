@@ -119,7 +119,7 @@ export const Track = ({
       <Cyclist
         style={{
           left: `${Math.min(
-            18 + (p1State.distance / options.totalDistance) * 72,
+            18 + (p1State.distance / options.raceDistanceM) * 72,
             90
           )}%`,
         }}
@@ -131,7 +131,7 @@ export const Track = ({
       <Cyclist
         style={{
           left: `${Math.min(
-            18 + (p2State.distance / options.totalDistance) * 72,
+            18 + (p2State.distance / options.raceDistanceM) * 72,
             90
           )}%`,
         }}

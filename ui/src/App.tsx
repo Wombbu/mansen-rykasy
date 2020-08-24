@@ -9,6 +9,7 @@ import {
   initialGameState,
   initialPlayerState,
   GameState,
+  gameOptions
 } from "./state";
 import { PlayerInfo } from "./PlayerInfo";
 import {
@@ -30,6 +31,8 @@ const SCROLLER_TEXT =
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const calculateTicksPerMeter = (rollerDiameterMm: number) => MAGNET_COUNT / ((rollerDiameterMm / 1000) * Math.PI);
+
 const useGameLogic = () => {
   const [p1, setP1State] = useRecoilState(p1State);
   const [p2, setP2State] = useRecoilState(p2State);
@@ -47,7 +50,7 @@ const useGameLogic = () => {
     messageHandlerRef.current = new MessageHandler();
   }, []);
 
-  const startGame = React.useCallback(async () => {
+  const startGame = React.useCallback(async (raceDistanceM: number, rollDiameterMm: number) => {
     setGame((it: GameState) => ({
       ...it,
       state: "PLAYING",
@@ -66,8 +69,9 @@ const useGameLogic = () => {
     setGame((it) => ({ ...it, countdown: null }));
 
     messageHandlerRef?.current?.setTickCountToFinish(
-      RACE_DISTANCE * TICKS_PER_METER
+      raceDistanceM * calculateTicksPerMeter(rollDiameterMm)
     );
+
     messageHandlerRef?.current?.start();
 
     const startTime = Date.now();
@@ -143,6 +147,8 @@ const App = () => {
 
   const [settingsVisible, setSettingsVisible] = React.useState(false);
 
+  const [options] = useRecoilState(gameOptions);
+
   return (
     <AppContainer>
       {settingsVisible && <Settings connect={connect} />}
@@ -170,7 +176,7 @@ const App = () => {
           onClick={() => {
             switch (game.state) {
               case "IDLE":
-                startGame();
+                startGame(options.raceDistanceM, Number(options.rollDiameterMm));
                 break;
               case "PLAYING":
                 resetGame();

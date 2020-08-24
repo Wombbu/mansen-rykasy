@@ -42,7 +42,7 @@ export const gameState = atom<GameState>({
 });
 
 export interface GameOptions {
-  totalDistance: number;
+  raceDistanceM: number;
   serverAdress: string;
   serverPort: string;
   rollDiameterMm: number;
@@ -53,7 +53,7 @@ export const gameOptions = atom({
   default: {
     serverAddress: "mansen.rykasy",
     serverPort: "9001",
-    rollDiameterMm: "80",
-    totalDistance: 400,
+    rollDiameterMm: "78.7",
+    raceDistanceM: 400,
   },
 });

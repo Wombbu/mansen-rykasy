@@ -24,12 +24,20 @@ export const Settings = ({connect}: {  connect: (url: string, port: number) => v
           setOptions((it) => ({ ...it, serverPort: e.target.value }))
         }
       />
-      <label>Rullan halkaisija mm</label>
+      <label>Rullan halkaisija (mm)</label>
       <input
         type="text"
         value={options.rollDiameterMm}
         onChange={(e: any) =>
           setOptions((it) => ({ ...it, rollDiameterMm: e.target.value }))
+        }
+      />
+      <label>Kilpailun pituus (m)</label>
+      <input
+        type="number"
+        value={options.raceDistanceM}
+        onChange={(e: any) =>
+          setOptions((it) => ({ ...it, raceDistanceM: e.target.value }))
         }
       />
       <button onClick={() => {
