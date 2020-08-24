@@ -163,7 +163,7 @@ const App = () => {
   const [options] = useRecoilState(gameOptions);
 
   React.useEffect(() => {
-    connect(options.serverAddress, options.serverPort);
+    connect(options.serverAddress, Number(options.serverPort));
   }, [])
 
   return (
