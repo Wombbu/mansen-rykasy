@@ -52,6 +52,8 @@ const useGameLogic = () => {
       state: "PLAYING",
     }));
 
+    // Reset just in case someone has ridden over race distance between races
+    // otherwise we would prolly get finishingTime in the first payload
     messageHandlerRef.current?.reset();
 
     setGame((it) => ({ ...it, countdown: 3 }));

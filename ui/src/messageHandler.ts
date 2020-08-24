@@ -1,10 +1,13 @@
 import Paho from "paho-mqtt";
 
+/**
+ * 
+ */
 class Api {
   client: any = null;
 
   reset() {
-    // Ei tarvetta resetille?
+    // No need for reset?
   }
 
   start() {
@@ -14,11 +17,10 @@ class Api {
   }
 
   constructor(messageHandler: any) {
-    var messageHandlerSelf = this;
-    messageHandlerSelf.client = new Paho.Client("192.168.10.47", 9001, "lauri");
-    messageHandlerSelf.client.onConnectionLost = console.log;
-    messageHandlerSelf.client.onMessageArrived = messageHandler;
-    messageHandlerSelf.client.connect();
+    this.client = new Paho.Client("192.168.10.47", 9001, "client_id");
+    this.client.onConnectionLost = alert;
+    this.client.onMessageArrived = messageHandler;
+    this.client.connect();
   }
 }
 
@@ -77,9 +79,10 @@ export class MessageHandler {
     this.p2TickPerHourCounter.reset();
     this.p1FinishingTime = null;
     this.p2FinishingTime = null;
+    // This just resets the count
+    this.apiSimulator.start();
   }
   start() {
-    // Just for debugging. Not needed in final product
     this.apiSimulator.start();
   }
   setTickCountToFinish(tickCountToFinish: number) {
