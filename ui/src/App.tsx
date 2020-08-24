@@ -162,6 +162,10 @@ const App = () => {
 
   const [options] = useRecoilState(gameOptions);
 
+  React.useEffect(() => {
+    connect(options.serverAddress, options.serverPort);
+  }, [])
+
   return (
     <AppContainer>
       {settingsVisible && <Settings connect={connect} />}
