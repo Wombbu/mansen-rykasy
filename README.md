@@ -16,3 +16,5 @@ A Goldsprint-styled game made in house by Bike Polo Tampere club members.
 * 2x Magnets
 * 2x Rollers
 * 2x Bicycles
+
+![Alt text](architecture.png?raw=true "Architecture")
