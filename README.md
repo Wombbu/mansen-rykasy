@@ -2,6 +2,8 @@
 
 A Goldsprint-styled game made in house by Bike Polo Tampere club members.
 
+### This project has been deployed to production
+![In production](https://media1.giphy.com/media/idSXRSbdCIFAGiTPlN/giphy.gif)
 
 ### Dependencies
 
