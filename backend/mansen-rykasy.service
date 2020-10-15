@@ -1,0 +1,13 @@
+[Unit]
+Description=mansen-rykasy backend
+After=mosquitto.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/home/kerho/mansen-rykasy/backend/backend.py
+
+[Install]
+WantedBy=multi-user.target
